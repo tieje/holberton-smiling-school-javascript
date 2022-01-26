@@ -1,0 +1,44 @@
+1/26/2021
+The last time I worked on this, I messed up the CSS.
+Instead of freaking out and reworking all of the CSS from scratch, I'm going to fix what I can along the way for each problem.
+
+Make functions that create assets like a card or carousel content.
+
+quote function
+A function that creates quote content as needed.
+
+video card function
+A function that creates card assets as needed.
+
+carousel content append function
+function that appends carousel assets
+
+loader function
+function that makes it so that the loader is shown while the API is loading data.
+
+Create an ajax function for every specific API request.
+
+#1. Homepage - quotes
+function LoadQuotes()
+1. Add unique IDs to all tags that you want to make variable.
+2. Function makes an ajax call that gets data from api.
+3. Select unique IDs and make changes.
+
+#2 and #3 are the same
+
+#4 is a simple ajax call and replace by selector
+
+#5. Dropdowns will be dynamic.
+API request function
+function that makes an API request when something changes in search value, topic, or sort by. This function will be called by an event listener.
+
+#6.
+This changes things.
+Create an ajax function for every API request. This way ajax calls are testable and easily modified by switching out functions.
+
+For the purpose of making this easier to write, I'm just going write everything in the script tag.
+
+new ids
+carouselSmileQuotes
+carouselSmilePopVideos
+carouselSmileLatestVideos
