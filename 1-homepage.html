@@ -215,76 +215,6 @@
     <!--MAIN-->
     <main>
       <!--CAROUSEL OF QUOTES-->
-      <section class="w-100 mx-0 bg-smile py-5">
-        <div class="container">
-          <div class="col-12 py-5">
-            <div
-              id="carouselSmileQuotes"
-              class="carousel slide d-flex justify-content-center"
-              data-ride="carousel"
-            >
-              <!--PREVIOUS-->
-              <!--NEXT-->
-              <!--CONTENT #1-->
-              <div class="carousel-inner w-75" id="quotesContent">
-                <div class="carousel-item active">
-                  <div class="row">
-                    <div class="col-12 col-md-4 m-auto text-center">
-                      <img
-                        class="rounded-circle"
-                        src="images/profile_5.jpg"
-                        alt="Profile 1"
-                        width="160"
-                        height="160"
-                      />
-                    </div>
-                    <div class="col-12 col-md-8 pt-5 m-auto">
-                      <p class="text-white font-weight-normal size-p">
-                        « Those tutorials are concise and go straight to the
-                        point. I can’t think of a better place to learn smiling.
-                        And it’s so fun!
-                      </p>
-                      <p class="text-white font-weight-bold size-p">
-                        Person Name
-                      </p>
-                      <p class="text-white font-weight-normal size-p">
-                        weather presenter
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <!--CONTENT #2-->
-                <div class="carousel-item">
-                  <div class="row">
-                    <div class="col-12 col-md-4 text-center m-auto">
-                      <img
-                        class="rounded-circle"
-                        src="images/profile_5.jpg"
-                        alt="Profile 1"
-                        width="160"
-                        height="160"
-                      />
-                    </div>
-                    <div class="col-12 col-md-8 pt-5 m-auto">
-                      <p class="text-white font-weight-normal size-p">
-                        « Those tutorials are concise and go straight to the
-                        point. I can’t think of a better place to learn smiling.
-                        And it’s so fun!
-                      </p>
-                      <p class="text-white font-weight-bold size-p">
-                        Person Name
-                      </p>
-                      <p class="text-white font-weight-normal size-p">
-                        weather presenter
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
       <!--POPULAR VIDEOS-->
       <section class="w-100 bg-white py-5">
         <!--TITLE-->
@@ -997,34 +927,34 @@
     </footer>
   </body>
   <script type="text/javascript">
-    /*
-    $(document).ready(function()) can be shortend to $(function())
-    This will be used at the very end to call functions.
-    https://stackoverflow.com/questions/1388043/different-forms-of-document-ready
-    */
-    function SpinLoader(id) {
-      $(`#${id}`).append('<div class="loader"></div>');
+    // carousel Components
+    function SpinLoader(selector) {
+      $(`${selector}`).append('<div class="loader"></div>');
     }
-    // quote function - A function that creates quote content as needed.
-    function quoteCreator(quoteDataObj) {}
-
-    // carousel building blocks
     function prevBlackArrow(id) {
-      console.log("appending prevArrow");
       $(`#${id}`).prepend(`
       <div class="carousel-control-prev text-center align-items-md-center align-items-start pt-5 pt-md-0">
-        <a href="#carouselSmilePopVideos" role="button" data-slide="prev">
+        <a href="#${id}" role="button" data-slide="prev">
           <img src="images/arrow_black_left.png" alt="Previous" width="30">
           <span class="sr-only">Previous</span>
         </a>
       </div>
       `);
     }
+    function nextBlackArrow(id) {
+      $(`#${id}`).prepend(`
+      <div class="carousel-control-next text-center align-items-md-center align-items-start pt-5 pt-md-0">
+        <a href="#${id}" role="button" data-slide="next">
+          <img src="images/arrow_black_right.png" alt="Next" width="30">
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+      `);
+    }
     function prevWhiteArrow(id) {
-      console.log("appending prevArrow");
       $(`#${id}`).append(`
       <div class="carousel-control-prev text-center align-items-md-center align-items-start pt-5 pt-md-0">
-        <a href="#carouselSmilePopVideos" role="button" data-slide="prev">
+        <a href="#${id}" role="button" data-slide="prev">
           <img src="images/arrow_white_left.png" alt="Previous" width="30">
           <span class="sr-only">Previous</span>
         </a>
@@ -1034,35 +964,35 @@
     function nextWhiteArrow(id) {
       $(`#${id}`).append(`
       <div class="carousel-control-next text-center align-items-md-center align-items-start pt-5 pt-md-0">
-        <a href="#carouselSmileQuotes" role="button" data-slide="next">
-          <img src="images/arrow_white_right.png" alt="" width="30" />
+        <a href="#${id}" role="button" data-slide="next">
+          <img src="images/arrow_white_right.png" alt="Next" width="30" />
           <span class="sr-only">Next</span>
         </a>
       </div>
       `);
     }
-    function carouselQuoteContent(appendId, contentId) {
-      $(`#${appendId}`).append(`
-      <div class="carousel-inner w-75" id="${contentId}"></div>
-      `);
-    }
-    function carouselQuoteParagraph(selector, data) {
+
+    // Quotes carousel
+    function carouselQuotesParagraph(selector, data) {
       $(`${selector}`).append(`
       <p class="text-white font-weight-bold size-p">${data}</p>
       `);
     }
-    function carouselQuoteParagraphContainer(selector, paraDataArr) {
-      $(`${selector}`).append(`
-      <div class="col-12 col-md-8 pt-5 m-auto">
+    function carouselQuotesParagraphContainer(selector, paraDataArr, id) {
+      const paraContainerId = `para-container-${id}`;
+      $(`#${selector}`).append(`
+      <div class="col-12 col-md-8 pt-5 m-auto"
+        id="${paraContainerId}"
+      >
       </div>
       `);
-      const paraSelector = selector + " div";
+      const paraSelector = paraContainerId;
       paraDataArr.forEach((val) => {
-        carouselQuoteContent(paraSelector, val);
+        carouselQuotesParagraph("#" + paraContainerId, val);
       });
     }
-    function carouselQuoteImage(selector, imageUrl) {
-      $(`${selector}`).append(`
+    function carouselQuotesImage(selector, imageUrl) {
+      $(`#${selector}`).append(`
       <div class="col-12 col-md-4 m-auto text-center">
       <img
         class="rounded-circle"
@@ -1073,56 +1003,53 @@
       </div>
       `);
     }
-    function carouselQuoteItem(carouselId, selector, dataObj, active) {
+    function carouselQuotesItem(carouselId, selector, obj, active) {
       // make active '' if not active or 'active' is active
-      const { id, picUrl, name, title, text } = dataObj;
-      const paraDataArr = [name, title, text];
-      const itemId = carouselId + '-' + id;
-      const selectorAppend = itemId + ' .row'
-      $(`${selector}`).append(`
+      const paraDataArr = [obj.name, obj.title, obj.text];
+      const itemId = carouselId + "-" + obj.id;
+      const selectorAppend = itemId + " .row";
+      $(`#${selector}`).append(`
       <div class="carousel-item ${active}" id="${itemId}"><div class="row"></div></div>
       `);
-      carouselQuoteImage(selectorAppend, picUrl);
-      carouselQuoteParagraphContainer(selectorAppend, paraDataArr);
+      carouselQuotesImage(selectorAppend, obj.pic_url);
+      carouselQuotesParagraphContainer(selectorAppend, paraDataArr, obj.id);
     }
-    function carouselQuoteContent() {
-      
+    function carouselQuotesContent(carouselId, data) {
+      const quoteItemSelector = carouselId + "-Content";
+      $(`#${carouselId}`).append(`
+      <div class="carousel-inner w-75" id="${quoteItemSelector}"></div>
+      `);
+      carouselQuotesItem(carouselId, quoteItemSelector, data[0], "active");
+      const dataRest = data.slice(1);
+      dataRest.forEach((obj) => {
+        carouselQuotesItem(carouselId, quoteItemSelector, obj, "");
+      });
     }
-    // Calls
-    // $(SpinLoader("carouselSmileQuotes"));
-    $(prevWhiteArrow("carouselSmileQuotes"));
-    $(nextWhiteArrow("carouselSmileQuotes"));
-    // $(carouselQuoteContent("carouselSmileQuotes", "quoteContent"));
+    function carouselQuotes(carouselId, selector) {
+      $(`${selector}`).prepend(`
+      <section class="w-100 mx-0 bg-smile py-5">
+        <div class="container">
+          <div class="col-12 py-5">
+            <div
+              id="${carouselId}"
+              class="carousel slide d-flex justify-content-center"
+              data-ride="carousel"
+            >
+      `);
+      $.ajax({
+        beforeSend: SpinLoader("#" + carouselId),
+        method: "GET",
+        url: "https://smileschool-api.hbtn.info/quotes",
+        dataType: "json",
+      }).done((data) => {
+        prevWhiteArrow(carouselId);
+        nextWhiteArrow(carouselId);
+        $("#" + carouselId + " .loader").remove();
+        carouselQuotesContent(carouselId, data);
+      });
+    }
 
-    // video card function - A function that creates card assets as needed.
-
-    // create video carousel function - A function that creates a video carousel
-
-    // carousel content append function - function that appends carousel assets
-
-    // loader function - function that makes it so that the loader is shown while the API is loading data.
-
-    // Create an ajax function for every specific API request.
-
-    // Task 1: LoadQuotes function
-    /*
-    1. Add unique IDs to all tags that you want to make variable.
-    2. Function makes an ajax call that gets data from api.
-    3. Select unique IDs and make changes.
-    */
-
-    // Task 2: LoadVideos function
-    /*
-    1. Add unique IDs to all tags that you want to make variable.
-    2. Function makes an ajax call that gets data from api.
-    3. Select unique IDs and make changes.
-    */
-
-    // Task 3: Same as task 2 but for the popular video section
-
-    // Task 4: Simple quote replacement by selector
-
-    // Task 5:
-    // Generic Dynamic Dropdowns function
+    const carouselQuotesId = "carouselSmileQuotes";
+    $(carouselQuotes(carouselQuotesId, "body main"));
   </script>
 </html>

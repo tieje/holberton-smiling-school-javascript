@@ -167,6 +167,7 @@ template {
 
 body {
   font-family: "Source Sans Pro", "Coiny";
+  overflow-x: hidden;
 }
 
 .font-smileschool {

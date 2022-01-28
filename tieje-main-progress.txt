@@ -42,3 +42,5 @@ new ids
 carouselSmileQuotes
 carouselSmilePopVideos
 carouselSmileLatestVideos
+
+async await is not ready in vanilla javascript. Because of this, I'll need to incorporate AJAX into the function itself.
