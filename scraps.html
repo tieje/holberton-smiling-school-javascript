@@ -59,18 +59,6 @@
             <!--SEARCH INPUT-->
             <!--DROPDOWN #1-->
             <!--DROPDOWN #2-->
-            <div class="form-group col-12 col-sm-6 col-md-4">
-              <label for="sort" class="text-uppercase font-weight-bold text-white">SORT BY</label>
-              <div class="d-flex align-items-center mix-blend-normal py-1 px-2 bg-smile-input rounded-top">
-                <span id="sort" class="form-control bg-transparent border-0 text-start text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Most popular</span>
-                <span class="dropdown-toggle text-white"></span>
-                <div class="dropdown-menu col-11 transformed-drop">
-                  <a class="dropdown-item">Most popular</a>
-                  <a class="dropdown-item">Most popular</a>
-                  <a class="dropdown-item">Most popular</a>
-                </div>
-              </div>
-            </div>
           </form>
         </div>
       </section>
@@ -78,7 +66,7 @@
       <section>
         <div class="container py-5">
           <p class="color-grey-smile">10 videos</p>
-          <div class="row py-4">
+          <div class="row py-4" id="video-filter-results">
             <!--RESULT #1-->
             <div class="d-flex col-12 col-sm-6 col-md-4 col-lg-3 px-sm-0">
               <div class="card border-0 ml-2">
@@ -423,43 +411,152 @@
       $(`${selector}`).append('<div class="loader"></div>');
     }
     // Search Input
-    function searchInput (selector, title) {
-      $(`selector`).prepend(`<div class="form-group col-12 col-md-4">
-      <label for="keywords" class="text-uppercase font-weight-bold text-white">${title}</label>
-      <div class="d-flex align-items-center mix-blend-normal py-1 px-2 bg-smile-input rounded-top">
-        <i class="hbicon-search" aria-hidden="true"></i>
-        <input type="text" class="form-control bg-transparent border-top-0 border-right-0 border-left-0 text-white place-holder" id="keywords" aria-describedby="keywords" placeholder="Search by keywords">
-        </div>
-      </div>
-      `)
-    }
-    // Generic DropDown
-    function dropDownForm (selector, title, initial, dropdownId, menuId) {
-      $(`${selector}`).prepend(`<div class="form-group col-12 col-sm-6 col-md-4">
-        <label for="${dropdownId}" class="font-weight-bold text-white">${title}</label>
+    function SearchInput (selector, title) {
+      $(`${selector}`).prepend(`
+      <div class="form-group col-12 col-md-4">
+        <label for="keywords" class="text-uppercase font-weight-bold text-white">${title}</label>
         <div class="d-flex align-items-center mix-blend-normal py-1 px-2 bg-smile-input rounded-top">
-          <span id="${dropdownId}" class="form-control bg-transparent border-0 text-start text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${initial}</span>
-          <span class="dropdown-toggle text-white"></span>
-          <div class="dropdown-menu col-11 transformed-drop id="${menuId}">
-            <a class="dropdown-item">Novice</a>
-            <a class="dropdown-item">Novice</a>
-            <a class="dropdown-item">Novice</a>
-          </div>
+          <i class="hbicon-search" aria-hidden="true"></i>
+          <input type="text" class="form-control bg-transparent border-top-0 border-right-0 border-left-0 text-white place-holder" id="keywords" aria-describedby="keywords" placeholder="Search by keywords">
         </div>
       </div>
       `);
     }
-    // https://stackoverflow.com/questions/15576548/how-to-pass-parameters-in-get-requests-with-jquery
+    // Generic DropDown
+    function toTitleCase(str) {
+      return str.toLowerCase().split(' ').map(function (word) {
+        return (word.charAt(0).toUpperCase() + word.slice(1));
+      }).join(' ');
+    }
+    function DropDownChooseOption (selector, opt) {
+      $(`#${selector}`).text(opt);
+    }
+    function DropDownOptions (selector, getArr, answerId) {
+      $.ajax({
+        type: 'GET',
+        url: "https://smileschool-api.hbtn.info/courses",
+        dataType: "json"
+      }).done((data) => {
+        console.log(data);
+        console.log(data[getArr]);
+        const OptArr = data[getArr];
+        OptArr.forEach((opt) => {
+          const camelOpt = toTitleCase(opt.replace('_', ' '));
+          $(`#${selector}`).append(`
+            <a class="dropdown-item" onclick="DropDownChooseOption('${answerId}', '${camelOpt}');">${camelOpt}</a>
+          `)
+        });
+      });
+    }
+    function DropDownForm (selector, title, initial, dropdownId, menuId, APIOptsArr) {
+      const chosenId = `${dropdownId}-chosen`;
+      $(`${selector}`).prepend(`
+      <div class="form-group col-12 col-sm-6 col-md-4">
+        <label for="${dropdownId}" class="font-weight-bold text-white">${title}</label>
+        <div class="d-flex align-items-center mix-blend-normal py-1 px-2 bg-smile-input rounded-top">
+          <span id="${chosenId}" class="form-control bg-transparent border-0 text-start text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${initial}</span>
+          <span class="dropdown-toggle text-white"></span>
+          <div class="dropdown-menu col-11 transformed-drop" id="${menuId}">
+          </div>
+        </div>
+      </div>
+      `);
+      DropDownOptions(menuId, APIOptsArr, chosenId);
+    }
 
+    // Plan: get all videos initially, then usee the keyword, topic, and sort by filters to remove irrelevant content
+    // Grab and Append all videos sorted by Most Recent.
+    function VideoCardStars(selector, number) {
+      const starsOff = `<img src="images/star_off.png" width="23" />`.repeat(
+        5 - number
+      );
+      const starsOn = `<img src="images/star_on.png" width="23" />`.repeat(
+        number
+      );
+      $("#" + selector).append(`
+        <div class="col-8 text-left pl-0">
+          ${starsOn}
+          ${starsOff}
+        </div>;
+      `);
+    }
+    function VideoCard(parentId, selector, data) {
+      const starsId = `${parentId}-stars-${data.star}`;
+      const subtitle = data["sub-title"];
+      $(`#${selector}`).append(`
+      <div class="card border-0 mr-2" style="width: 16rem">
+        <div class="d-flex align-items-center justify-content-center">
+          <img
+            src="${data.thumb_url}"
+            alt="Video #1"
+            class="card-img-top"
+          />
+          <img
+            src="images/play.png"
+            alt="Video #1"
+            class="position-absolute w-25"
+          />
+        </div>
+        <div class="card-body">
+          <h5 class="card-title font-weight-bold text-dark">${data.title}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item border-0 color-grey-smile">
+            ${subtitle}
+          </li>
+          <li class="list-group-item d-flex align-item-center border-0">
+            <img
+              class="rounded-circle"
+              src="${data.author_pic_url}"
+              alt="${data.author_pic_url}"
+              width="30"
+              height="30"
+            />
+            <p class="pl-3 color-smile my-auto">${data.author}</p>
+          </li>
+          <li class="list-group-item d-flex border-0"
+          id="${starsId}">
+            ${carouselVideosCardStars(starsId, data.star)}
+            <div class="col-4 color-smile text-right pt-1">
+              <span>${data.duration}</span>
+            </div>
+          </li>
+        </ul>
+      </div>;
+      `);
+    }
+    function VideoFilterResultsSection (parentId, selector) {
+      $.ajax({
+        type: 'GET',
+        url: "https://smileschool-api.hbtn.info/courses",
+        dataType: "json"
+      }).done((data) => {
+        $(`${selector}`).append(`
+        <section>
+          <div class="container py-5">
+            <p class="color-grey-smile">${data.courses.length} videos</p>
+            <div class="row py-4" id="${parentId}">
+        `);
+        const courses = data.courses;
+        const orderedCourses = courses.sort(
+          function(a, b) {return b.published_at - a.published_at}
+        )
+        console.log(orderedCourses);
+        orderedCourses.forEach((vid) => {
+          VideoCard(parentId, parentId, data);
+        });
+      });
+    }
     // Variables
-    const sectionClass = 'bg-smile'
+    const sectionClass = 'bg-smile';
     const filterSelector = '.' + sectionClass + ' div form';
     const dropdownFormId1 = sectionClass + '-dropdown-1';
     const dropdownFormId2 = sectionClass + '-dropdown-2';
+    const videoResultsParentId = 'video-filter-results';
     // Calls
-    dropDownForm(filterSelector, 'SORT BY', 'Most popular', 'sort', dropdownFormId2);
-    dropDownForm(filterSelector, 'TOPIC', 'Novice', 'topic', dropdownFormId1);
-    searchInput(filterSelector, 'Keyword');
-    
+    $(DropDownForm(filterSelector, 'SORT BY', 'Most Recent', 'sort', dropdownFormId2, 'sorts'));
+    $(DropDownForm(filterSelector, 'TOPIC', 'All', 'topic', dropdownFormId1, 'topics'));
+    $(SearchInput(filterSelector, 'Keyword'));
+
   </script>
 </html>
