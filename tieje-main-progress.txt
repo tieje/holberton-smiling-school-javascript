@@ -44,3 +44,12 @@ carouselSmilePopVideos
 carouselSmileLatestVideos
 
 async await is not ready in vanilla javascript. Because of this, I'll need to incorporate AJAX into the function itself.
+
+1/28/2021
+
+I reached the point of diminishing returns. I know what I would do if I had to complete this thing.
+Keyword and topic are not working, but Sort by is working.
+
+I learned a lot about how jquery works.
+I'll need to work on CSS later by recreating certain parts of websites.
+I'm not a big fan of bootstrap but it is a pretty simple solution after...

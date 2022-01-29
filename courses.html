@@ -56,6 +56,46 @@
     <!--FOOTER-->
   </body>
   <script>
+    // custom functions
+    function DropDownFilterVideoList(opt) {
+      const sortbys = [
+        'most recent',
+        'most popular',
+        'most viewed',
+        'all'
+      ];
+      const topics = [
+        'Novice',
+        'Intermediate',
+        'Expert'
+      ];
+      if (sortbys.includes(opt)) {
+        $(`#${videoResultsParentId}`).remove();
+        $(`body footer`).remove();
+        VideoFilterResultsSection(videoResultsParentId, ToMain, opt, 'all');
+      } else if (topics.includes(opt)) {
+        console.log(opt);
+        topics.forEach((topic) => {
+          if (topic !== opt) {
+            $(`[data-topic=${topic}]`).remove();
+          };
+        });
+      }
+    };
+    function SearchByKeyword(courses, word) {
+      if (word === 'all') {
+        return courses
+      }
+      let newArr = [];
+      const lowercase = word.toLowerCase()
+      courses.forEach((course) => {
+        if (course.keywords.includes(lowercase)) {
+          newArr.push(course);
+        }
+      });
+      return newArr;
+    }
+    // generic functions
     function addFooter() {
       $("body").append(`
       <footer class="bg-smile-dark">
@@ -86,7 +126,7 @@
       </div>
     </footer>
       `);
-    }    
+    };
     function SpinLoader(selector) {
       $(`${selector}`).append('<div class="loader"></div>');
     }
@@ -110,7 +150,8 @@
     }
     function DropDownChooseOption (selector, opt) {
       $(`#${selector}`).text(opt);
-      FilterVideoList(opt.toLowerCase());
+      console.log(opt);
+      DropDownFilterVideoList(opt.toLowerCase());
     }
     function DropDownOptions (selector, getArr, answerId) {
       $.ajax({
@@ -143,12 +184,13 @@
       DropDownOptions(menuId, APIOptsArr, chosenId);
     }
     function FilterSection (parentId, selector) {
+      const formSelector = parentId + '-form';
       $(`${selector}`).prepend(`
       <!--FORM TO SEARCH-->
       <section class="${parentId}">
         <div class="container">
           <!--FORM-->
-          <form class="py-5 row">
+          <form class="py-5 row ${formSelector}">
             <!--SEARCH INPUT-->
             <!--DROPDOWN #1-->
             <!--DROPDOWN #2-->
@@ -162,12 +204,20 @@
     $(DropDownForm(filterSelector, 'SORT BY', 'Most Recent', 'sort', dropdownFormId2, 'sorts'));
     $(DropDownForm(filterSelector, 'TOPIC', 'All', 'topic', dropdownFormId1, 'topics'));
     $(SearchInput(filterSelector, 'Keyword'));
+    $('.' + formSelector).on('submit', e => {
+      e.preventDefault();
+      const keyword = $('#keywords').val();
+      VideoFilterResultsSection(videoResultsParentId, ToMain, 'most recent', 'all');
+    })
     }
     // Plan: get all videos initially, then usee the keyword, topic, and sort by filters to remove irrelevant content
     // Grab and Append all videos sorted by Most Recent.
     function AttachVideoData(cardId, data) {
-      Object.keys(data).forEach((key) => {
-        console.log(key +': ' + data[key]);
+      viewableData = [
+        'keywords',
+        'topic',
+      ]
+      viewableData.forEach((key) => {
         $(`#${cardId}`).attr(`data-${key}`, `${data[key]}`);
       });
     };
@@ -233,15 +283,28 @@
       VideoCardStars(starsId, data.star);
       AttachVideoData(cardId, data);
     }
-    function VideoFilterResultsSection (parentId, selector) {
+    function CourseSort(courses, sortType) {
+      switch (sortType) {
+        case 'most recent':
+          return courses.sort(function (a, b) {return b.published_at - a.published_at});
+        case 'most viewed':
+          return courses.sort(function (a, b) {return b.views - a.views});
+        case 'most popular':
+          return courses.sort(function (a, b) {return b.star - a.star});
+        default:
+          return courses
+      }
+    }
+    function VideoFilterResultsSection (parentId, selector, sortType, keyword) {
       const videosListId = parentId + 'VideosList';
       const videosAmtId = parentId + 'NumberOfVideos'
-      $(`${selector}`).prepend(`
+      $(`${selector}`).append(`
       <section id="${parentId}">
         <div class="container py-5">
           <p class="color-grey-smile" id="${videosAmtId}"></p>
           <div class="row py-4" id="${videosListId}"></div>
         </div>
+      </section>
       `);
       SpinLoader('#' + videosListId);
       $.ajax({
@@ -251,23 +314,21 @@
       }).done((data) => {
         $(`#${videosAmtId}`).text(`${data.courses.length} videos`);
         const courses = data.courses;
-        const orderedCourses = courses.sort(
-          function(a, b) {return b.published_at - a.published_at}
-        )
-        orderedCourses.forEach((vid) => {
+        const orderedCourses = CourseSort(courses, sortType);
+        const keywordCourses = SearchByKeyword(orderedCourses, keyword);
+        keywordCourses.forEach((vid) => {
           VideoCard(parentId, videosListId, vid);
         })
         $('.loader').remove();
-        console.log('made it out');
       });
+      addFooter();
     }
     // Variables
     const filterSectionParentId = 'bg-smile';
     const videoResultsParentId = 'vid-results';
-    const prependToMain = 'body main';
+    const ToMain = 'body main';
     // Calls
-    $(VideoFilterResultsSection(videoResultsParentId, prependToMain));
-    $(FilterSection(filterSectionParentId, prependToMain));
-    $(addFooter());
+    $(FilterSection(filterSectionParentId, ToMain));
+    $(VideoFilterResultsSection(videoResultsParentId, ToMain, 'most recent', 'all'));
   </script>
 </html>
